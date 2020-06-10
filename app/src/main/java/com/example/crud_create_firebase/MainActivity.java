@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -36,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
 
+    Persona personaSeleccionada;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +54,17 @@ public class MainActivity extends AppCompatActivity {
 
         initializarFirebase(); //always on top to reach all data bellow.
         listarDatos();
+
+        listV_personas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                personaSeleccionada = (Persona) parent.getItemAtPosition(position);
+                nomP.setText(personaSeleccionada.getNombre());
+                appP.setText(personaSeleccionada.getApellido());
+                correoP.setText(personaSeleccionada.getCorreo());
+                passwordP.setText(personaSeleccionada.getPassword());
+            }
+        });
 
     }
 
@@ -125,6 +140,15 @@ public class MainActivity extends AppCompatActivity {
 
                 }
                 else {
+
+                    Persona p = new Persona();
+                    p.setUid(personaSeleccionada.getUid());
+                    p.setNombre(nomP.getText().toString().trim());
+                    p.setApellido(appP.getText().toString().trim());
+                    p.setCorreo(correoP.getText().toString().trim());
+                    p.setPassword(passwordP.getText().toString().trim());
+                    databaseReference.child("Persona").child(p.getUid()).setValue(p);
+
                     Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
                     cleantxt();
                 }
